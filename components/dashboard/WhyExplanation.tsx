@@ -1,39 +1,64 @@
-// src/components/dashboard/WhyExplanation.tsx
 'use client';
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
-interface WhyExplanationProps {
-  text: string;
-  subScores: { dryness: number; weather: number; safety: number; convenience: number };
+import React from 'react';
+
+interface MetricDetail {
+  value: string | number;
+  impact: 'Positive' | 'Neutral' | 'Negative';
+  description: string;
 }
 
-export default function WhyExplanation({ text, subScores }: WhyExplanationProps) {
+interface Matrix {
+  moisture: MetricDetail;
+  wind: MetricDetail;
+  precipitation: MetricDetail;
+  growth: MetricDetail;
+}
+
+interface WhyExplanationProps {
+  matrix: Matrix;
+}
+
+export default function WhyExplanation({ matrix }: WhyExplanationProps) {
+  const getImpactBadge = (impact: string) => {
+    switch (impact) {
+      case 'Positive':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'Negative':
+        return 'bg-rose-100 text-rose-800 border-rose-200';
+      default:
+        return 'bg-slate-100 text-slate-700 border-slate-200';
+    }
+  };
+
+  const metricItems = [
+    { label: '💧 Leaf Moisture', data: matrix.moisture },
+    { label: '💨 Wind Speed', data: matrix.wind },
+    { label: '🌧️ Rain History', data: matrix.precipitation },
+    { label: '🌱 Growth Rate', data: matrix.growth },
+  ];
+
   return (
-    <Card className="h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          📋 WHY IS MY SCORE THIS?
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300 font-medium">
-          "{text}"
-        </p>
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          {Object.entries(subScores).map(([key, val]) => (
-            <div key={key} className="space-y-1">
-              <div className="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 capitalize">
-                <span>{key} Analysis</span>
-                <span>{val}%</span>
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-full flex flex-col justify-between">
+      <div>
+        <h3 className="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+          <span>🧠</span> Factor Breakdown Matrix
+        </h3>
+        
+        <div className="space-y-4">
+          {metricItems.map((item, index) => (
+            <div key={index} className="border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs font-semibold text-slate-700">{item.label}</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getImpactBadge(item.data.impact)}`}>
+                  {item.data.value}
+                </span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${val}%` }} />
-              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">{item.data.description}</p>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

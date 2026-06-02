@@ -1,29 +1,64 @@
-// src/components/dashboard/WindowCards.tsx
 'use client';
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 
-interface WindowCardsProps {
-  title: string;
-  timeWindow: string;
+import React from 'react';
+
+interface Window {
+  day: string;
+  timeSlot: string;
+  status: 'Excellent' | 'Good' | 'Poor';
   score: number;
-  variant: 'primary' | 'secondary';
+  reason: string;
 }
 
-export default function WindowCards({ title, timeWindow, score, variant }: WindowCardsProps) {
-  const isPrimary = variant === 'primary';
+interface WindowCardsProps {
+  windows: Window[];
+}
+
+export default function WindowCards({ windows }: WindowCardsProps) {
+  // Helper to determine background colors based on mowing status
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'Excellent':
+        return 'bg-emerald-50 border-emerald-200 text-emerald-800 tag-bg-emerald-600';
+      case 'Good':
+        return 'bg-amber-50 border-amber-200 text-amber-800 tag-bg-amber-500';
+      default:
+        return 'bg-rose-50 border-rose-200 text-rose-800 tag-bg-rose-500';
+    }
+  };
+
   return (
-    <Card className={`relative overflow-hidden border transition-transform duration-200 hover:scale-[1.01] ${isPrimary ? 'bg-emerald-600 border-emerald-700 text-white shadow-lg' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
-      <CardContent className="p-5 flex justify-between items-center">
-        <div className="space-y-1">
-          <p className={`text-xs font-black tracking-widest uppercase ${isPrimary ? 'text-emerald-100' : 'text-slate-400'}`}>{title}</p>
-          <p className="text-xl font-bold tracking-tight">{timeWindow}</p>
-        </div>
-        <div className={`px-3 py-2 rounded-xl text-center min-w-[52px] ${isPrimary ? 'bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100'}`}>
-          <span className="block text-lg font-black leading-none">{score}</span>
-          <span className="text-[9px] uppercase tracking-tighter opacity-60 font-bold">Index</span>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+        <span>⏱️</span> Best Upcoming Mowing Windows
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {windows.slice(0, 3).map((window, index) => {
+          const styles = getStatusStyles(window.status);
+          const badgeColor = window.status === 'Excellent' ? 'bg-emerald-600' : window.status === 'Good' ? 'bg-amber-500' : 'bg-rose-500';
+          
+          return (
+            <div 
+              key={index} 
+              className={`rounded-2xl border p-5 shadow-sm bg-white flex flex-col justify-between transition-all hover:shadow-md`}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-base">{window.day}</h4>
+                    <p className="text-xs text-slate-500 font-medium">{window.timeSlot}</p>
+                  </div>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full text-white ${badgeColor}`}>
+                    {window.status} ({window.score}/100)
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">{window.reason}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

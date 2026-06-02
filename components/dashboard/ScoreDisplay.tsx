@@ -1,52 +1,58 @@
-// src/components/dashboard/ScoreDisplay.tsx
 'use client';
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 
-interface BulletItem {
-  status: 'success' | 'warning' | 'error';
-  text: string;
-}
+import React from 'react';
 
 interface ScoreDisplayProps {
   score: number;
-  verdict: string;
-  headline: string;
-  bullets: BulletItem[];
+  rating: string;
+  location: string;
 }
 
-export default function ScoreDisplay({ score, verdict, headline, bullets }: ScoreDisplayProps) {
+export default function ScoreDisplay({ score, rating, location }: ScoreDisplayProps) {
+  // Determine dynamic accent colors based on the mowing score value
+  const getScoreColor = (scoreValue: number) => {
+    if (scoreValue >= 80) return { text: 'text-emerald-600', border: 'border-emerald-200', bg: 'bg-emerald-50' };
+    if (scoreValue >= 50) return { text: 'text-amber-600', border: 'border-amber-200', bg: 'bg-amber-50' };
+    return { text: 'text-rose-600', border: 'border-rose-200', bg: 'bg-rose-50' };
+  };
+
+  const colors = getScoreColor(score);
+
   return (
-    <Card className="overflow-hidden border-2 border-emerald-500/20 dark:border-emerald-400/10 shadow-xl bg-white dark:bg-slate-900">
-      <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-8">
-        <div className="relative flex items-center justify-center w-40 h-40 shrink-0">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="8" className="text-slate-100 dark:text-slate-800" fill="transparent" />
-            <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="8" className="text-emerald-500 dark:text-emerald-400" fill="transparent"
-                    strokeDasharray={263.8} strokeDashoffset={263.8 - (263.8 * score) / 100} strokeLinecap="round" />
-          </svg>
-          <div className="absolute flex flex-col items-center justify-center">
-            <span className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white">{score}</span>
-            <span className="text-xs uppercase font-bold tracking-widest text-slate-400">Score</span>
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        {/* Left Side: Meta Text Context */}
+        <div className="space-y-2 text-center md:text-left">
+          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">
+            Live Analysis
+          </span>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight mt-1">
+            {location || 'Current Location'}
+          </h2>
+          <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+            Our turf algorithms have calculated your local grass growth cycles against active atmospheric moisture, wind patterns, and precipitation data.
+          </p>
+        </div>
+
+        {/* Right Side: Visual Circular Data Widget */}
+        <div className={`flex items-center gap-5 border p-4 rounded-xl px-6 ${colors.bg} ${colors.border}`}>
+          <div className="relative flex items-center justify-center">
+            {/* Simple Circular Ring Layout */}
+            <div className="w-16 h-16 rounded-full border-4 border-slate-200 absolute"></div>
+            <div className={`w-16 h-16 rounded-full border-4 border-t-current border-r-current rotate-45 absolute ${colors.text}`}></div>
+            <span className="text-xl font-black text-slate-800 z-10">{score}</span>
+          </div>
+          
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mowing Index</div>
+            <div className={`text-xl font-extrabold tracking-tight ${colors.text}`}>
+              {rating}
+            </div>
           </div>
         </div>
 
-        <div className="space-y-3 w-full">
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
-            {verdict}
-          </div>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">{headline}</h2>
-          
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-            {bullets.map((bullet, idx) => (
-              <li key={idx} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                <span className={`w-2 h-2 rounded-full ${bullet.status === 'success' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                {bullet.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

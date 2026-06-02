@@ -37,5 +37,5 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed processing server metrics.' }, { status: 500 });
-  }
+  } 
 }
